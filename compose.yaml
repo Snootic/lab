@@ -28,6 +28,7 @@ services:
     environment:
       DOMAIN: ${VAULTWARDEN_DOMAIN}
       SINGUPS_ALLOWED: "true"
+      ADMIN_TOKEN: ${VAULTWARDEN_ADMIN_TOKEN}
     networks:
       - lab
     volumes:
