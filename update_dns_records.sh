@@ -2,14 +2,11 @@
 
 if [ -f ".env" ]; then
     source .env
+    source ipv6_utils.sh
 else
     echo "No env file, please create one in order to use your credentials"
     exit 1
 fi
-
-IP_FILE="/tmp/last_ipv6.txt"
-
-IPV6=$(ip -6 a | awk '/inet6/ && !/fe80/ && !/::1/ {print $2}' | cut -d/ -f1 | head -n 1)
 
 get_records() {
 	records=$(curl -X GET "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records" \
@@ -34,46 +31,59 @@ update_record_address() {
 
 parse_records() {
 	local records="$1"
-	echo "$records" | jq -c '.result[]' | while read -r item; do
+	local service_name="$2"
+    local ipv6="$3"
+
+    echo "$records" | jq -c '.result[]' | while read -r item; do
     		id=$(echo "$item" | jq -r '.id')
     		type=$(echo "$item" | jq -r '.type')
+            name=$(echo "$item" | jq -r '.name')
 
     	case $type in
-		#A) content=$IPV4 ;; # since I don't have a public IPV4 address, will be using ipv6 only. Maybe using a cloudflared tunnel can fix my problem.
-		AAAA) content=$IPV6 ;;
-		*) continue ;;
+		    #A) content=$IPV4 ;; # since I don't have a public IPV4 address, will be using ipv6 only. Maybe using a cloudflared tunnel can fix my problem.
+		    AAAA) content="$ipv6" ;;
+		    *) continue ;;
     	esac
 
-    	update_record_address "$id" "$content"
+        local parsed_name=$(echo "$name" | awk -F'.' '{print $1}') 
+        if [ "$service_name" == "$parsed_name" ]; then
+            update_record_address "$id" "$content"
+        fi
 	done
 }
 
-watch_ip() {
-    if [ ! -f "$IP_FILE" ]; then
-        echo "$IPV6" > "$IP_FILE"
-        echo "Previous IPV6 not found. Updating records anyway for $IPV6"
-        return 0
-    fi
-
-    local previous_ipv6=$(cat "$IP_FILE")
-
-    if [ "$IPV6" != "$previous_ipv6" ]; then
-        echo "IPV6 changed, updating records"
-        echo "$IPV6" > "$IP_FILE"
-        return 0
-    else
-        echo "IPV6 did not change, doing nothing"
-        return 1
-    fi
+get_containers() {
+    docker container ps --format "{{.Names}}"
 }
 
+update_container_records() {
+    local container="$1"
+    local ipv6="$2"
+    local records="$3"
 
-# main script
+    parse_records "$records" "$container" "$ipv6"
+}
 
-if watch_ip; then
+force_container_update() {
+    local container="$1"
+    local records=$(get_records)
+    local raw_ip=$(get_public_ipv6 "$container")
+    local ipv6=$(parse_ipv6 "$raw_ip")
+
+    update_container_records "$container" "$ipv6" "$records"
+}
+
+if watch_host_ip; then
+    containers=$(get_containers)
+
     records=$(get_records)
 
-    parse_records "$records"
-else
-    echo "No changes made"
+    for container in $containers; do
+        raw_ip=$(get_public_ipv6 "$container")
+        ipv6=$(parse_ipv6 "$raw_ip")
+
+        if watch_container_ip "$container" "$ipv6"; then
+            update_container_records "$container" "$ipv6" "$records"
+        fi
+    done
 fi
