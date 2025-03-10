@@ -4,7 +4,7 @@ services:
     image: pihole/pihole:latest
     networks:
       lab:
-        ipv4_address: 192.168.0.120
+        ipv4_address: ${PIHOLE_IPV4_ADDRESS}
     ports:
       - "53:53/udp"
       - "53:53/tcp"
