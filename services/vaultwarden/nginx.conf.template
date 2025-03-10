@@ -17,7 +17,7 @@ http {
         ssl_certificate_key /etc/letsencrypt/live/${DOMAIN}/privkey.pem;
 
         location / {
-            proxy_pass http://vaultwarden;
+            proxy_pass http://vaultwarden_server;
             proxy_set_header Host ${env}host;
             proxy_set_header X-Real-IP ${env}remote_addr;
             proxy_set_header X-Forwarded-For ${env}proxy_add_x_forwarded_for;
