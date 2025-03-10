@@ -10,7 +10,12 @@ get_public_ipv6() {
     # this way we can get the address, but still need to parse it
     local container="$1"
 
-    docker exec -it $container sh -c 'awk "/eth0/ && !/fe80/ && !/fd00/ {print \$1}" /proc/net/if_inet6 | head -n 1'
+    raw_ip=$(docker exec -it $container sh -c 'awk "/eth0/ && !/fe80/ && !/fd00/ {print \$1}" /proc/net/if_inet6 | head -n 1')
+
+    ipv6=$(parse_ipv6 "$raw_ip")
+
+    echo "$ipv6"
+
 }
 
 parse_ipv6() {
