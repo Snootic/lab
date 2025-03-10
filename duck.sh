@@ -11,4 +11,4 @@ IPV4=$(curl 'https://api.ipify.org')
 echo $IPV4
 IPV6=$(ip -6 a | awk '/inet6/ && !/fe80/ && !/::1/ {print $2}' | cut -d/ -f1 | head -n 1)
 
-echo url="https://www.duckdns.org/update?domains=$DUCK_DOMAIN&token=$DUCK_TOKEN&ip=$IPV4&ipv6=$IPV6" | curl -k -o ~/duckdns/duck.log -K -
+echo url="https://www.duckdns.org/update?domains=$DUCKDNS_DOMAIN&token=$DUCK_TOKEN&ip=$IPV4&ipv6=$IPV6" | curl -k -o ~/duckdns/duck.log -K -
