@@ -1,0 +1,42 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden_server
+    restart: always
+    environment:
+      DOMAIN: https://vaultwarden.${DOMAIN}
+      SIGNUPS_ALLOWED: "true"
+      ADMIN_TOKEN: ${VAULTWARDEN_ADMIN_TOKEN}
+    networks:
+      - lab
+    volumes:
+      - ./vw-data:/data
+    expose:
+      - "80"
+      - "443"
+  nginx:
+    image: nginx:latest
+    container_name: vaultwarden #setting the nginx name as vaultwarden because it is the container where the records will be updated
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN}
+      env: "$"
+    volumes:
+      - ./nginx.conf.template:/etc/nginx/nginx.conf.template
+      - cert_data:/etc/letsencrypt
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - lab
+    depends_on:
+      - vaultwarden
+    entrypoint: /bin/bash -c "while [ ! -f /etc/letsencrypt/live/${DOMAIN}/fullchain.pem ]; do echo 'Waiting for SSL certificates...'; sleep 5; done; envsubst < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
+
+networks:
+  lab:
+    external: true
+
+volumes:
+  cert_data:
+    external: true

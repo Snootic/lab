@@ -1,0 +1,22 @@
+services:
+  certbot:
+    container_name: certbot
+    image: serversideup/certbot-dns-cloudflare
+    volumes:
+      - cert_data:/etc/letsencrypt
+      - ./resolv.conf:/etc/resolv.conf
+    networks:
+      - lab
+    environment:
+      CLOUDFLARE_API_TOKEN: "${CLOUDFLARE_API_TOKEN}"
+      CERTBOT_EMAIL: "${CERTBOT_EMAIL}"
+      CERTBOT_DOMAINS: "${CERTBOT_DOMAINS}"
+      CERTBOT_KEY_TYPE: "rsa"
+
+volumes:
+  cert_data:
+    external: true
+
+networks:
+  lab:
+    external: true
