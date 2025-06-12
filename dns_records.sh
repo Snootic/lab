@@ -87,14 +87,14 @@ create_dns_record() {
         2) type="AAAA"
            content=$(get_public_ipv6 "$service_name") ;;
         3) # Criar registros A e AAAA separadamente
-           ipv4=$(get_public_ipv4 "$service_name")
+           # ipv4=$(get_public_ipv4 "$service_name") # doesnt make sense
            ipv6=$(get_public_ipv6 "$service_name")
 
            request_a=$(curl -X POST "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/dns_records" \
                -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
                -H "Content-Type: application/json" \
                --data "$(jq -n \
-                   --arg content "$ipv4" \
+                   --arg content "$PUBLIC_IPV4" \
                    --arg name "$service_name" \
                    --argjson proxied $proxied \
                    --arg type "A" \
