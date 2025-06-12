@@ -12,6 +12,9 @@ services:
       CERTBOT_EMAIL: "${CERTBOT_EMAIL}"
       CERTBOT_DOMAINS: "${CERTBOT_DOMAINS}"
       CERTBOT_KEY_TYPE: "rsa"
+      CLOUDFLARE_PROPAGATION_SECONDS: 60
+
+    restart: unless-stopped
 
 volumes:
   cert_data:
