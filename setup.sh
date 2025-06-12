@@ -2,6 +2,12 @@
 source .env
 source dns_records.sh
 
+create_macvlan_bridge() {
+	ip link add macvlan_host link $INTERFACE type macvlan mode bridge
+	ip addr add 192.168.1.253/24 dev macvlan_host
+	ip link set macvlan_host up
+}
+
 create_service() {
     read -p "Your service name: " service_name
 
