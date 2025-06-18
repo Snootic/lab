@@ -12,19 +12,20 @@ else
 fi
 
 get_records() {
-    if ! declare -f "$1" > /dev/null; then
-        #To get all records
-	    records=$(curl -X GET "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/dns_records" \
-	    -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-	    -H "Content-Type: application/json")
-
-	else
-        local dns_record_id="$1"
-        records=$(curl -X GET "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/dns_records/$dns_record_id" \
+    if [ -z "$1" ]; then
+        # No argument passed: Get all records
+        records=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/dns_records" \
         -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
         -H "Content-Type: application/json")
+    else
+        # Argument passed: Get a specific DNS record by ID
+        local dns_record_id="$1"
+        records=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/dns_records/$dns_record_id" \
+        -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+        -H "Content-Type: application/json")
+    fi
 
-    echo $records
+    echo "$records"
 }
 
 update_record_address() {
