@@ -3,6 +3,7 @@ services:
     container_name: pihole
     image: pihole/pihole:latest
     networks:
+      local:
       lab:
         ipv4_address: ${PIHOLE_IPV4_ADDRESS}
     ports:
@@ -23,4 +24,6 @@ services:
 
 networks:
   lab:
+    external: true
+  local:
     external: true

@@ -1,0 +1,43 @@
+services:
+  minecraft-xaolins:
+    image: openjdk:22
+    container_name: minecraft_xaolins
+    working_dir: /data
+    command: sh start.sh
+    networks:
+      - local
+    volumes:
+      - "./paper:/data"
+    ports:
+      - "25565:25565"
+      - "19132:19132"
+      - "8080:8080"
+      - "25575:25575"
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+  minecraft-vanilla:
+    image: openjdk:22
+    container_name: minecraft_vanilla
+    working_dir: /data
+    command: sh start.sh
+    networks:
+      - local
+    volumes:
+      - "./paper-vanilla:/data"
+    ports:
+      - "25565:25565"
+      - "8080:8080"
+      - "25575:25575"
+      - "24454:24454"
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+networks:
+  local:
+    external: true
+
+volumes:
+  cert_data:
+    external: true
