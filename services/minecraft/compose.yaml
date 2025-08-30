@@ -8,11 +8,6 @@ services:
       - local
     volumes:
       - "./paper:/data"
-    ports:
-      - "25565:25565"
-      - "19132:19132"
-      - "8080:8080"
-      - "25575:25575"
     stdin_open: true
     tty: true
     restart: unless-stopped
@@ -25,11 +20,6 @@ services:
       - local
     volumes:
       - "./paper-vanilla:/data"
-    ports:
-      - "25565:25565"
-      - "8080:8080"
-      - "25575:25575"
-      - "24454:24454"
     stdin_open: true
     tty: true
     restart: unless-stopped

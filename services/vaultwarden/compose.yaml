@@ -8,12 +8,9 @@ services:
       SIGNUPS_ALLOWED: "true"
       ADMIN_TOKEN: ${VAULTWARDEN_ADMIN_TOKEN}
     networks:
-      - lab
+      - local
     volumes:
       - ./vw-data:/data
-    expose:
-      - "80"
-      - "443"
 
 networks:
   local:

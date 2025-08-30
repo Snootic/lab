@@ -14,7 +14,7 @@ services:
       CERTBOT_KEY_TYPE: "rsa"
       CLOUDFLARE_PROPAGATION_SECONDS: 60
 
-    restart: unless-stopped
+  restart: unless-stopped
 
 volumes:
   cert_data:
