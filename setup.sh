@@ -61,13 +61,25 @@ EOF
 }
 
 start_all() {
-    echo "Starting all services..."
-    services=("pihole" "vaultwarden" "minecraft")
+    echo "Starting all services except nginx..."
+    services=("certbot" "pihole" "vaultwarden" "minecraft")
 
     for service in "${services[@]}"; do
-        echo "Starting $service..."
-        docker compose -f "services/$service/compose.yaml" up -d
+        if [ -f "services/$service/compose.yaml" ]; then
+            echo "Starting $service..."
+            docker compose --env-file ".env" -f "services/$service/compose.yaml" up -d
+        else
+            echo "Warning: Compose file for $service not found, skipping."
+        fi
     done
+
+    echo "Starting nginx..."
+    if [ -f "services/nginx/compose.yaml" ]; then
+        docker compose --env-file ".env" -f "services/nginx/compose.yaml" up -d
+        echo "nginx started!"
+    else
+        echo "Warning: Compose file for nginx not found, skipping."
+    fi
 
     echo "All services started!"
 }
