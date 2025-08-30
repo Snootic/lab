@@ -1,0 +1,29 @@
+services:
+  nginx:
+    container_name: nginx
+    image: nginx:latest
+    environment:
+      DOMAIN: ${DOMAIN}
+      DOMAIN2: ${DOMAIN2}
+      env: "$"
+    volumes:
+      - cert_data:/etc/letsencrypt:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - local
+      - lab
+    restart: unless-stopped
+    entrypoint: /bin/bash -c "while [ ! -f /etc/letsencrypt/live/${DOMAIN}/fullchain.pem ]; do echo 'Waiting for SSL certificates...'; sleep 5; done; nginx -g 'daemon off;'"
+
+volumes:
+  cert_data:
+    external: true
+
+networks:
+  local:
+    external: true
+  lab:
+    external: true

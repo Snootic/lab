@@ -16,6 +16,14 @@ create_lab_network() {
         -o parent=$INTERFACE lab
 }
 
+create_private_network() {
+    docker network create -d bridge \
+        --subnet 172.20.0.0/24 \
+        --gateway 172.20.0.1 \
+        --attachable \
+        local
+}
+
 get_containers() {
     docker container ps --format "{{.Names}}"
 }
