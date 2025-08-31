@@ -9,6 +9,7 @@ services:
     volumes:
       - cert_data:/etc/letsencrypt:ro
       - ./nginx.conf.template:/etc/nginx/nginx.conf.template
+      - ./logs:/var/log/nginx/
     ports:
       - "80:80"
       - "443:443"
