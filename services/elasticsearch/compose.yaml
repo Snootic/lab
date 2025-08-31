@@ -8,6 +8,7 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=false
       - ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
+      - ES_JAVA_OPTS=-Xmx2G
     ports:
       - '9200:9200'
       - '9300:9300'
