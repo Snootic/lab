@@ -4,7 +4,6 @@ services:
     image: serversideup/certbot-dns-cloudflare
     volumes:
       - cert_data:/etc/letsencrypt
-      - ./resolv.conf:/etc/resolv.conf
     networks:
       - local
     environment:
@@ -13,8 +12,10 @@ services:
       CERTBOT_DOMAINS: "${CERTBOT_DOMAINS}"
       CERTBOT_KEY_TYPE: "rsa"
       CLOUDFLARE_PROPAGATION_SECONDS: 60
-
-  restart: unless-stopped
+    dns:
+      - 172.20.0.2 #pihole ip on local
+    restart: 
+      unless-stopped
 
 volumes:
   cert_data:
