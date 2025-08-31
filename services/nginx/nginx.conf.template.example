@@ -50,13 +50,12 @@ http {
 # For minecraft servers
 stream { 
     upstream minecraft_server {
-        server minecraft_vanilla:25565;
+        server minecraft_proxy:25565;
     }
 
-     server {
+    server {
         listen 25565;
+        listen [::]:25565;
         proxy_pass minecraft_server;
-     }
+    }
 }
-
-

@@ -1,13 +1,27 @@
 services:
-  minecraft-xaolins:
+  proxy:
+    image: itzg/mc-router
+    container_name: minecraft_proxy
+    environment:
+      MAPPING: |
+        minecraft.${DOMAIN}=minecraft-vanilla:25565
+        mods.${DOMAIN}=minecraft-mods:25565
+      SIMPLIFY_SRV: "true"
+    networks:
+      - local
+    depends_on:
+      - minecraft-mods
+      - minecraft-vanilla
+    restart: unless-stopped
+  minecraft-mods:
     image: openjdk:22
-    container_name: minecraft_xaolins
+    container_name: minecraft_mods
     working_dir: /data
     command: sh start.sh
     networks:
       - local
     volumes:
-      - "./paper:/data"
+      - "./fabric:/data"
     stdin_open: true
     tty: true
     restart: unless-stopped
@@ -19,15 +33,11 @@ services:
     networks:
       - local
     volumes:
-      - "./paper-vanilla:/data"
+      - "./vanilla:/data"
     stdin_open: true
     tty: true
     restart: unless-stopped
 
 networks:
   local:
-    external: true
-
-volumes:
-  cert_data:
     external: true
